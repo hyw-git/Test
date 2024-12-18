@@ -2,7 +2,7 @@
 #include <vector>
 #include "Inventory.h"
 
-const int STACK_MAX = 9999;
+const int STACK_MAX = 99;
 
 struct item_in_storage                         //容器中的物品堆位置与数量
 {
@@ -90,4 +90,14 @@ int Inventory::min_stack(std::vector<item_in_storage>& found_items)
 		min_stack = found_items[i].num < found_items[min_stack].num ? i : min_stack;
 	}
 	return min_stack;
+}
+
+int Item::Interaction()
+{
+	if (ID == axe)
+		return 1;
+	else if (ID == hoe)
+		return 2;
+	else if (ID == seed)
+		return 3;
 }

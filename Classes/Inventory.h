@@ -1,12 +1,19 @@
 #pragma once
 #include <iostream>
 #include <vector>
+
+#define axe 1000
+#define hoe 1100
+#define seed 4225
 class Item                                  //物品堆
 {
+private:
 	int ID;                                 //物品的ID
-	int type;                               //物品的类型（目前只有工具被特殊考虑）
 	int num;                                //物品的数量
 	friend Inventory;
+public:
+	Item(int sID, int snum) :ID(sID), num(snum) {};
+	int Interaction();
 };
 class Inventory
 {
