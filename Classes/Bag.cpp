@@ -1,14 +1,17 @@
-#include "EscScene.h"
-#include "Def.h"
+#include "Bag.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
+Bag::Bag() {
+    character = Character::getInstance();
+}
+
 //创建一个登录场景
-Scene* Esc::createScene()
+Scene* Bag::createScene()
 {
     auto scene = Scene::create();
-    auto layer = Esc::create();
+    auto layer = Bag::create();
     scene->addChild(layer);
     return scene;
 }
@@ -21,7 +24,7 @@ static void problemLoading(const char* filename)
 }
 
 //登陆界面初始化
-bool Esc::init()
+bool Bag::init()
 {
     if (!Scene::init())
     {
@@ -31,45 +34,32 @@ bool Esc::init()
     //background
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    auto spriteBack = Sprite::create("suspendscene.jpg");
+    auto spriteBack = Sprite::create("bag.png");
+    auto background = Sprite::create("Begin.png");
 
-    /************************
-     * 设置背景图精灵位置信息
-     * 锚点：    （0.5, 0.5）
-     * 位置：     窗口中心
-     * 竖直放缩： 1.2倍
-    ************************/
+    background->setAnchorPoint(Vec2(0.5, 0.5));
+    background->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
+    this->addChild(background);
+
     spriteBack->setAnchorPoint(Vec2(0.5, 0.5));
     spriteBack->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
-    spriteBack->setScale(1.5);
     this->addChild(spriteBack);
 
-    //设置菜单（start/end）
-    auto menuStart = MenuItemImage::create("continue.png", "continue.png", CC_CALLBACK_1(Esc::continueGame, this));
-    menuStart->setScale(1.5);
-    menuStart->setPosition(visibleSize.width / 2 + origin.x - 100, 200);
+    auto menuEnd = MenuItemImage::create("exit.png", "exit.png", CC_CALLBACK_1(Bag::close, this));
+    menuEnd->setPosition(visibleSize.width / 2 + 320, 495);
 
-    auto menuEnd = MenuItemImage::create("quit.png", "quit.png", CC_CALLBACK_1(Esc::endGame, this));
-    menuEnd->setScale(1.5);
-    menuEnd->setPosition(visibleSize.width / 2 + origin.x + 100, 200);
-
-    auto menu = Menu::create(menuStart, menuEnd, NULL);
+    auto menu = Menu::create(menuEnd, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu);
     return true;
 }
 
-void Esc::menuCloseCallback(Ref* pSender)
+void Bag::menuCloseCallback(Ref* pSender)
 {
     Director::getInstance()->end();
 }
 
 //start game
-void Esc::continueGame(Ref* obj) { 
+void Bag::close(Ref* obj) {         //切换场景
     Director::getInstance()->popScene();
-}
-
-//end game
-void Esc::endGame(Ref* obj) {
-    Director::getInstance()->end();
 }

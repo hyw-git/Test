@@ -1,22 +1,21 @@
 #include "MyMap.h"
-#include "GameBeginScene.h"
 #include "SimpleAudioEngine.h"
 
-
 USING_NS_CC;
-#define basic_size 30
 
-#define Ground 2929
-#define SEED 4225
-#define CROP 4224
+MyMap::MyMap() {
+    moveLeft = false;
+    moveRight = false;
+    moveUp = false;
+    moveDown = false;
 
-#define K_W  EventKeyboard::KeyCode::KEY_W
-#define K_S  EventKeyboard::KeyCode::KEY_S
-#define K_A  EventKeyboard::KeyCode::KEY_A
-#define K_D  EventKeyboard::KeyCode::KEY_D
-#define K_F  EventKeyboard::KeyCode::KEY_F
-#define K_C  EventKeyboard::KeyCode::KEY_C
-#define K_ESC EventKeyboard::KeyCode::KEY_ESCAPE
+    run_A = false;
+    run_D = false;
+    run_W = false;
+    run_S = false;
+    character = Character::getInstance();
+    character.set_speed(40.0);
+}
 
 //创建初始地图场景
 Scene* MyMap::createMapScene()
@@ -45,22 +44,37 @@ bool MyMap::init()
     mapTild = TMXTiledMap::create("map.tmx");
     mapTild->setAnchorPoint(Vec2(0.5, 0.5));
     mapTild->setPosition(winSize.width / 2, winSize.height / 2);
-    this->addChild(mapTild);
+    this->addChild(mapTild, 0);
     
     //Add sprite
     _sprite = Sprite::create("character.png");
     _sprite->setPosition(basic_size / 2 + winSize.width / 2, basic_size / 2  + winSize.height / 2);
-    addChild(_sprite);
+    addChild(_sprite, 1);
 
     //更新获取sprite当前位置信息
     CalcSite();                    
 
     auto set = MenuItemImage::create("CloseNormal.png", "CloseSelected.png", CC_CALLBACK_1(MyMap::Set, this));
+    auto hoe = MenuItemImage::create("hoe.png", "hoe.png", CC_CALLBACK_1(MyMap::Change_Hoe, this));
+    auto seed = MenuItemImage::create("seed.png", "seed.png", CC_CALLBACK_1(MyMap::Change_Seed, this));
+    auto sickle = MenuItemImage::create("sickle.png", "sickle.png", CC_CALLBACK_1(MyMap::Change_Sickle, this));
+    
     set->setPosition(900, 600);
-     
-    auto menu = Menu::create(set, NULL);
+    hoe->setAnchorPoint(Vec2(0.5, 0.5));
+    hoe->setPosition(winSize.width / 2 - 3.5 * basic_size, basic_size / 2);
+    seed->setAnchorPoint(Vec2(0.5, 0.5));
+    seed->setPosition(winSize.width / 2 - 1.5 * basic_size, basic_size / 2);
+    sickle->setAnchorPoint(Vec2(0.5, 0.5));
+    sickle->setPosition(winSize.width / 2 - 2.5 * basic_size, basic_size / 2);
+
+    auto menu = Menu::create(set, hoe, seed, sickle, NULL);
     menu->setPosition(Vec2::ZERO);
-    this->addChild(menu);
+    this->addChild(menu, 4);
+
+    auto goods = Sprite::create("goods.png");
+    goods->setAnchorPoint(Vec2(0.5, 0.5));
+    goods->setPosition(winSize.width / 2, basic_size / 2);
+    this->addChild(goods, 3);
 
     //监听键盘
     auto listener = cocos2d::EventListenerKeyboard::create();
@@ -80,14 +94,14 @@ bool MyMap::init()
 
 //更新当前主角在maptild中的位置
 void MyMap::CalcSite() {
-    spriteCurPos = ccp((int)(_sprite->getPositionX() - mapTild->getPositionX()) / basic_size + 25,
-                       ((int)(mapTild->getPositionY() - _sprite->getPositionY() + basic_size / 2)) / basic_size + 24);
+    spriteCurPos = ccp((int)(_sprite->getPositionX() - mapTild->getPositionX()) / basic_size + 24,
+                       ((int)(mapTild->getPositionY() - _sprite->getPositionY() + basic_size / 2)) / basic_size + 25);
 }
 
 //判断每一帧的移动
 void MyMap::update(float deltaTime) {
     Node::update(deltaTime);
-    Point spriteNextPos = spriteCurPos;
+    spriteNextPos = spriteCurPos;
     TMXLayer* ly = mapTild->getLayer("layer1");
 
     if (moveLeft) {
@@ -98,10 +112,10 @@ void MyMap::update(float deltaTime) {
             Ani_A();
         }
         if ((_sprite->getPositionX() < basic_size * 4) && (mapTild->getContentSize().width / 2 - mapTild->getPositionX()) > 30)
-            mapTild->setPosition(mapTild->getPositionX() + moveSpeed * deltaTime, mapTild->getPositionY());
+            mapTild->setPosition(mapTild->getPositionX() + character.get_speed() * deltaTime, mapTild->getPositionY());
         else if (_sprite->getPositionX() > 30) {
             
-            _sprite->setPosition(_sprite->getPositionX() - moveSpeed * deltaTime, _sprite->getPositionY());
+            _sprite->setPosition(_sprite->getPositionX() - character.get_speed() * deltaTime, _sprite->getPositionY());
         }
     }
 
@@ -113,9 +127,9 @@ void MyMap::update(float deltaTime) {
             Ani_D();
         }
         if ((_sprite->getPositionX() > 480 + basic_size / 2 * 23) && (mapTild->getContentSize().width / 2 + mapTild->getPositionX()) > 960)
-            mapTild->setPosition(mapTild->getPositionX() - moveSpeed * deltaTime, mapTild->getPositionY());
+            mapTild->setPosition(mapTild->getPositionX() - character.get_speed() * deltaTime, mapTild->getPositionY());
         else if (_sprite->getPositionX() < basic_size * 31)
-            _sprite->setPosition(_sprite->getPositionX() + moveSpeed * deltaTime, _sprite->getPositionY());
+            _sprite->setPosition(_sprite->getPositionX() + character.get_speed() * deltaTime, _sprite->getPositionY());
     }
 
     if (moveUp) {
@@ -126,9 +140,9 @@ void MyMap::update(float deltaTime) {
             Ani_W();
         }
         if ((_sprite->getPositionY() > 320 + basic_size / 2 * 15) && (mapTild->getContentSize().height / 2 + mapTild->getPositionY()) > 670)
-            mapTild->setPosition(mapTild->getPositionX(), mapTild->getPositionY() - moveSpeed * deltaTime);
+            mapTild->setPosition(mapTild->getPositionX(), mapTild->getPositionY() - character.get_speed() * deltaTime);
         else if (!ly->getTileGIDAt(spriteNextPos) && _sprite->getPositionY() < basic_size * 21)
-            _sprite->setPosition(_sprite->getPositionX(), _sprite->getPositionY() + moveSpeed * deltaTime);
+            _sprite->setPosition(_sprite->getPositionX(), _sprite->getPositionY() + character.get_speed() * deltaTime);
     }
 
     if (moveDown) {
@@ -139,9 +153,9 @@ void MyMap::update(float deltaTime) {
             Ani_S();
         }
         if ((_sprite->getPositionY() < basic_size * 4) && (mapTild->getContentSize().height / 2 - mapTild->getPositionY()) > 30)
-            mapTild->setPosition(mapTild->getPositionX(), mapTild->getPositionY() + moveSpeed * deltaTime);
+            mapTild->setPosition(mapTild->getPositionX(), mapTild->getPositionY() + character.get_speed() * deltaTime);
         else if (_sprite->getPositionY() > 30)
-            _sprite->setPosition(_sprite->getPositionX(), _sprite->getPositionY() - moveSpeed * deltaTime);
+            _sprite->setPosition(_sprite->getPositionX(), _sprite->getPositionY() - character.get_speed() * deltaTime);
     }
 }
 
@@ -207,6 +221,8 @@ void MyMap::Ani_S() {
 
 //监听键盘事件切换到对应函数和场景
 void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
+    TMXLayer* ly;
+    TMXLayer* ly1;
     switch (keyCode) {
     case K_ESC:
         Esc();
@@ -227,19 +243,43 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
         moveRight = true;   
         CalcSite();
         break;
+    case K_B:
+        Bag();
+        break;
+    case K_E:
+        Room();
+        break;
     case K_F:               //与场景物交互
-        TMXLayer* ly = mapTild->getLayer("layer0");
-        if (ly->getTileGIDAt(spriteCurPos, nullptr) == Ground) {
-            ly = mapTild->getLayer("layer2");
-            ly->setTileGID(SEED, spriteCurPos);
-            cropX.push_back(spriteCurPos.x);
-            cropY.push_back(spriteCurPos.y);
-            scheduleOnce(schedule_selector(MyMap::onCropMature), 2.0);
+        if (character.get_tool() == SEED) {
+            ly = mapTild->getLayer("layer0");
+            if (ly->getTileGIDAt(spriteCurPos, nullptr) == Ground) {
+                ly = mapTild->getLayer("layer2");
+                ly->setTileGID(SEED, spriteCurPos);
+                cropX.push_back(spriteCurPos.x);
+                cropY.push_back(spriteCurPos.y);
+                scheduleOnce(schedule_selector(MyMap::onCropMature), 2.0);
+            }
         }
-//       else if (ly->getTileGIDAt(spriteCurPos, nullptr) == ) {}
+        else if (character.get_tool() == HOE){
+            ly = mapTild->getLayer("layer0");
+            ly1 = mapTild->getLayer("layer2");
+            if (ly1->getTileGIDAt(spriteCurPos, nullptr) == STONE) {
+                ly1->removeTileAt(spriteCurPos);
+                character.Get_Item(STONE, 1);
+            }
+            else if (ly->getTileGIDAt(spriteCurPos, nullptr) == GRASS) {
+                ly->setTileGID(Ground, spriteCurPos);
+            }
+        }
+        else if (character.get_tool() == SICKLE) {
+            ly = mapTild->getLayer("layer2");
+            if (ly->getTileGIDAt(spriteCurPos, nullptr) == CROP) {
+                ly->removeTileAt(spriteCurPos);
+                // crop++
+            }
+        }
         break;
     }
-
     return;
 }
 
@@ -270,6 +310,7 @@ void MyMap::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
         moveRight = run_D = false;
         _sprite->stopAllActions();
     }
+    CalcSite();
     return;
 }
 
@@ -279,9 +320,38 @@ void MyMap::Esc() {
     Director::getInstance()->pushScene(scene);
 }
 
+//背包界面
+void MyMap::Bag() {
+    auto scene = Bag::createScene();
+    Director::getInstance()->pushScene(scene);
+}
+
+void MyMap::Room() {
+    TMXLayer* ly = mapTild->getLayer("layer0");
+    if (ly->getTileGIDAt(spriteCurPos, nullptr) == DOOR) {
+        auto scene = Room::createMapScene();
+        Director::getInstance()->pushScene(scene);
+    }
+}
+
 //空菜单（可用于切换场景）
 void MyMap::Set(Ref* obj) {
 
+}
+
+void MyMap::Change_Hoe(Ref* obj) {
+    if (character.Has_Hoe())
+        character.set_tool(HOE);
+}
+
+void MyMap::Change_Seed(Ref* obj) {
+    if (character.Has_Seed())
+        character.set_tool(SEED);
+}
+
+void MyMap::Change_Sickle(Ref* obj) {
+    if (character.Has_Sickle())
+        character.set_tool(SICKLE);
 }
 
 void MyMap::menuCloseCallback(Ref* pSender)
