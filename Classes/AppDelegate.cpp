@@ -96,8 +96,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // create a scene. it's an autorelease object
     auto scene = GameBegin::createScene();
- // auto scene = MyMap::createMapScene();  //用于直接测试地图
-    // run
     director->runWithScene(scene);        //登录界面
 
     return true;

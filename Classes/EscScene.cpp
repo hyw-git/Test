@@ -33,18 +33,12 @@ bool Esc::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     auto spriteBack = Sprite::create("suspendscene.jpg");
 
-    /************************
-     * 设置背景图精灵位置信息
-     * 锚点：    （0.5, 0.5）
-     * 位置：     窗口中心
-     * 竖直放缩： 1.2倍
-    ************************/
     spriteBack->setAnchorPoint(Vec2(0.5, 0.5));
     spriteBack->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
     spriteBack->setScale(1.5);
     this->addChild(spriteBack);
 
-    //设置菜单（start/end）
+    //设置菜单（continue/end）
     auto menuStart = MenuItemImage::create("continue.png", "continue.png", CC_CALLBACK_1(Esc::continueGame, this));
     menuStart->setScale(1.5);
     menuStart->setPosition(visibleSize.width / 2 + origin.x - 100, 200);
@@ -64,12 +58,12 @@ void Esc::menuCloseCallback(Ref* pSender)
     Director::getInstance()->end();
 }
 
-//start game
+//继续游戏
 void Esc::continueGame(Ref* obj) { 
     Director::getInstance()->popScene();
 }
 
-//end game
+//结束游戏
 void Esc::endGame(Ref* obj) {
     Director::getInstance()->end();
 }

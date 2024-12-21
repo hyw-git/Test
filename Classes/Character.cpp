@@ -4,6 +4,20 @@ void Character::Get_Item(int id, int sum) {
 	inventory.Add_Item(id, sum);
 }
 
+void Character::Remove_Item(int id, int num) {
+	for (int ix = 0; ix < num; ix++) {
+		inventory.Remove_Item(id);
+	}
+}
+
+bool Character::Get_Message(int site, int& id, int& num) {
+	return inventory.Get_Message(site, id, num);
+}
+
+int Character::Get_cus() {
+	return inventory.Get_cus();
+}
+
 float Character::get_speed() {
 	return speed;
 }
@@ -30,4 +44,8 @@ bool Character::Has_Seed() {
 
 bool Character::Has_Sickle() {
 	return (inventory.Check_Item(SICKLE) != -1);
+}
+
+bool Character::Has_Stone() {
+	return (inventory.Check_Item(STONE) != -1);
 }
