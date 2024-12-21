@@ -13,8 +13,6 @@ MyMap::MyMap() {
     run_D = false;
     run_W = false;
     run_S = false;
-    character = Character::getInstance();
-    character.set_speed(40.0);
 }
 
 //创建初始地图场景
@@ -40,25 +38,26 @@ bool MyMap::init()
         return false;
     const auto winSize = Director::getInstance()->getWinSize();    //获取窗口尺寸
     
-    //Add TMX map
+    //加入地图
     mapTild = TMXTiledMap::create("map.tmx");
     mapTild->setAnchorPoint(Vec2(0.5, 0.5));
     mapTild->setPosition(winSize.width / 2, winSize.height / 2);
     this->addChild(mapTild, 0);
     
-    //Add sprite
+    //加入角色精灵
     _sprite = Sprite::create("character.png");
     _sprite->setPosition(basic_size / 2 + winSize.width / 2, basic_size / 2  + winSize.height / 2);
     addChild(_sprite, 1);
 
-    //更新获取sprite当前位置信息
-    CalcSite();                    
+    CalcSite();           //更新获取sprite当前位置信息
 
+    //鼠标交互的按钮设置
     auto set = MenuItemImage::create("CloseNormal.png", "CloseSelected.png", CC_CALLBACK_1(MyMap::Set, this));
     auto hoe = MenuItemImage::create("hoe.png", "hoe.png", CC_CALLBACK_1(MyMap::Change_Hoe, this));
     auto seed = MenuItemImage::create("seed.png", "seed.png", CC_CALLBACK_1(MyMap::Change_Seed, this));
     auto sickle = MenuItemImage::create("sickle.png", "sickle.png", CC_CALLBACK_1(MyMap::Change_Sickle, this));
     
+    //菜单位置设置
     set->setPosition(900, 600);
     hoe->setAnchorPoint(Vec2(0.5, 0.5));
     hoe->setPosition(winSize.width / 2 - 3.5 * basic_size, basic_size / 2);
@@ -243,10 +242,10 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
         moveRight = true;   
         CalcSite();
         break;
-    case K_B:
+    case K_B:               //打开背包
         Bag();
         break;
-    case K_E:
+    case K_E:               //进入房间
         Room();
         break;
     case K_F:               //与场景物交互
@@ -255,6 +254,7 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
             if (ly->getTileGIDAt(spriteCurPos, nullptr) == Ground) {
                 ly = mapTild->getLayer("layer2");
                 ly->setTileGID(SEED, spriteCurPos);
+                character.Remove_Item(SEED, 1);
                 cropX.push_back(spriteCurPos.x);
                 cropY.push_back(spriteCurPos.y);
                 scheduleOnce(schedule_selector(MyMap::onCropMature), 2.0);
@@ -275,7 +275,8 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
             ly = mapTild->getLayer("layer2");
             if (ly->getTileGIDAt(spriteCurPos, nullptr) == CROP) {
                 ly->removeTileAt(spriteCurPos);
-                // crop++
+                character.Get_Item(CROP, 1);
+                character.Get_Item(SEED, 2);
             }
         }
         break;
@@ -326,6 +327,7 @@ void MyMap::Bag() {
     Director::getInstance()->pushScene(scene);
 }
 
+//进入房间
 void MyMap::Room() {
     TMXLayer* ly = mapTild->getLayer("layer0");
     if (ly->getTileGIDAt(spriteCurPos, nullptr) == DOOR) {

@@ -205,11 +205,24 @@ void Room::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
         moveRight = true;
         CalcSite();
         break;
-    case K_E:               //与场景物交互
+    case K_E:               //出房间
         ly = mapTild->getLayer("layer0");
         if (ly->getTileGIDAt(spriteCurPos, nullptr) == ROOM_DOOR)
             Director::getInstance()->popScene();
         break;
+    case K_B:               //打开背包
+        bag();
+        break;
+    case K_F:               //合成
+        ly = mapTild->getLayer("layer0");
+        if (ly->getTileGIDAt(spriteCurPos, nullptr) == COM) {
+            character.Remove_Item(STONE, 2);
+            character.Get_Item(SICKLE, 1);
+            auto myLabel = Label::createWithSystemFont("+ SICKLE * 1", "Arial", 16);
+            myLabel->setPosition(Vec2(80, 20));
+            myLabel->setVisible(true);
+            this->addChild(myLabel);
+        }
     }
     return;
 }
@@ -239,6 +252,12 @@ void Room::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
 //esc键暂停
 void Room::Esc() {
     auto scene = Esc::createScene();
+    Director::getInstance()->pushScene(scene);
+}
+
+//打开背包
+void Room::bag() {
+    auto scene = Bag::createScene();
     Director::getInstance()->pushScene(scene);
 }
 
