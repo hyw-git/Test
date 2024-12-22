@@ -1,39 +1,41 @@
-#ifndef NPC_H
-#define NPC_H
+#ifndef __NPC_H__
+#define __NPC_H__
 
 #include "cocos2d.h"
 #include <string>
 #include <vector>
 
-class NPC : public cocos2d::Sprite {
+class NPC : public cocos2d::Node {
 public:
-    // 创建 NPC
-    static NPC* create(const std::string& name, const std::string& spritePath);
+    // 创建 NPC 对象
+    static NPC* create(const std::string& name, const std::string& spritePath, const std::vector<std::string>& dialogues);
 
-    // 初始化 NPC
-    bool init(const std::string& name, const std::string& spritePath);
+    // 初始化 NPC 对象
+    bool init(const std::string& name, const std::string& spritePath, const std::vector<std::string>& dialogues);
 
-    // 对话系统
-    std::string getDialog() const;            // 获取当前对话
-    void advanceDialog();                     // 推进到下一句对话
-    void jumpToDialog(int index);             // 跳转到指定的对话内容
-    void resetDialog();                       // 重置对话（回到第一句）
+    // 对话相关功能
+    std::string getCurrentDialogue() const;    // 获取当前对话
+    void advanceDialogue();                    // 推进到下一句对话
+    void resetDialogue();                      // 重置对话（回到第一句）
 
-    // 设置 NPC 的精灵位置
+    // 设置精灵的位置
     void setSpritePosition(const cocos2d::Vec2& position);
 
     // 获取 NPC 名称
     std::string getName() const;
 
 private:
-    // 构造和析构函数
-    NPC();                                  // 构造函数（私有）
-    ~NPC();                                 // 析构函数（私有）
+    NPC();                                    // 构造函数
+    virtual ~NPC();                           // 析构函数
 
-    std::string name;                       // NPC 的名称
-    cocos2d::Sprite* sprite;                // NPC 的精灵（精灵会通过 Cocos2d 进行管理）
-    std::vector<std::string> dialogues;     // 对话内容集合
-    int currentDialogIndex;                 // 当前对话的索引
+    void createTouchListener();               // 创建触摸事件监听器
+    void updateDialogueUI();                  // 更新对话 UI 显示
+
+    std::string m_name;                       // NPC 名称
+    cocos2d::Sprite* m_sprite;                // NPC 精灵
+    cocos2d::Label* m_dialogueLabel;          // 显示对话的标签
+    std::vector<std::string> m_dialogues;     // 对话内容集合
+    int m_currentDialogueIndex;               // 当前对话的索引
 };
 
-#endif // NPC_H
+#endif // __NPC_H__
