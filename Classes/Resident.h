@@ -38,13 +38,17 @@ public:
     std::shared_ptr<Task> createTask();               // 创建任务
     void offerTaskToSystem(CommunitySystem* system); // 提供任务到任务系统
     void completeTask(std::shared_ptr<Task> task);   // 完成任务
+    void updateTaskProgress(); // 更新任务进度
+    void assignTask(std::shared_ptr<Task> task); // 分配任务
+
 
     // 社交相关
-    void participateInFestival(const std::string& festivalName); // 参与节日
+    void participateInFestival(const std::string& festivalName);// 参与节日
     void updateFriendship(int points);                          // 更新友好度
     bool offerBouquet();                                         // 赠送花束
     bool offerMermaidPendant();                                  // 赠送美人鱼吊坠（结婚）
-    void triggerRomanticEvent();         // 触发浪漫事件
+    void triggerRomanticEvent();                                // 触发浪漫事件
+
     // 状态查询
     bool isRomantic() const;                         // 是否处于恋爱关系
     bool isSpouse() const;                           // 是否已结婚
@@ -54,10 +58,13 @@ public:
     void addGold(int gold);
     void addReputation(int reputation);
     void setTexture(std::string);
+
     // 日程相关
     void updateSchedule(int currentHour); // 更新居民日程
     // 礼物相关
     void acceptGift(const std::string& giftName, GiftPreference preference);
+
+    const std::vector<std::shared_ptr<Task>>& getTasks() const; // 获取分配的任务
 private:
     std::string name; // 居民姓名
     bool isMarriable; // 是否可结婚
@@ -65,11 +72,13 @@ private:
     int heartLevel;       // 心等级
     RelationshipStatus status; // 当前关系状态
     bool heartEventTriggered;  // 是否触发特殊剧情
-    int Gold = 0;
-    int Reputation = 0;
+    int Gold;                  // 当前金币数量
+    int Reputation;            // 当前声望值
 
     std::vector<std::shared_ptr<Task>> taskTemplates; // 任务模板
+    std::vector<std::shared_ptr<Task>> assignedTasks; // 存储分配给居民的任务
     std::vector<Schedule> dailySchedule;             // 日程安排
 };
+
 
 #endif // RESIDENT_H
