@@ -48,7 +48,7 @@ bool Bag::init()
     int init_x_num = 250, init_y_num = 445;   //初始数字基点位置
     cus = character.Get_cus();                //获取背包已有容量
     if (cus != -1) {
-        for (int ix = 0; ix < cus; ix++, init_x += 75, init_x_num += 75) {
+        for (int ix = 0; ix < cus; ix++) {
             character.Get_Message(ix, id, num);           //获取每一格中的物品信息
             if (id == HOE) {                              //锄头的有关显示信息
                 auto item = Sprite::create("hoe.png");
@@ -134,6 +134,88 @@ bool Bag::init()
                 myLabel->setPosition(Vec2(init_x_num, init_y_num));
                 myLabel->setVisible(true);
                 this->addChild(myLabel);
+            }
+            else if (id == MONEY) {                        //MONEY的有关显示信息
+                auto item = Sprite::create("money.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
+            else if (id == ITEM1) {                        //item1的有关显示信息
+                auto item = Sprite::create("item1.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
+            else if (id == ITEM2) {                        //item2的有关显示信息
+                auto item = Sprite::create("item2.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
+            else if (id == ITEM3) {                        //item3的有关显示信息
+                auto item = Sprite::create("item3.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
+            else if (id == ITEM4) {                        //item4的有关显示信息
+                auto item = Sprite::create("item4.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
+            else if (id == ITEM5) {                        //item5的有关显示信息
+                auto item = Sprite::create("item5.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
+            if (!((ix + 1) % 8) && (ix + 1) / 8) {
+                init_x = 220;
+                init_x_num = 250;
+                init_y -= 75;
+                init_y_num -= 75;
+            }
+            else {
+                init_x += 75;
+                init_x_num += 75;
             }
         }
     }

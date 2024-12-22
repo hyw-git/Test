@@ -14,6 +14,12 @@
 #define COM 949               //合成
 #define EGG 25                //鸡蛋
 #define CHICKEN 5040
+#define MONEY 3
+#define ITEM1 11
+#define ITEM2 12
+#define ITEM3 13
+#define ITEM4 14
+#define ITEM5 15
 
 //各种key
 #define K_W  EventKeyboard::KeyCode::KEY_W

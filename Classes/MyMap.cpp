@@ -258,7 +258,7 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
                 character.Remove_Item(SEED, 1);
                 cropX.push_back(spriteCurPos.x);
                 cropY.push_back(spriteCurPos.y);
-                scheduleOnce(schedule_selector(MyMap::onCropMature), 2.0);
+                scheduleOnce(schedule_selector(MyMap::onCropMature), 1.0);
             }
         }
         else if (character.get_tool() == HOE) {

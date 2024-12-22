@@ -23,6 +23,7 @@ public:
 		speed = 0;
 		inventory.Add_Item(HOE);
 		inventory.Add_Item(SEED, 100);
+		inventory.Add_Item(MONEY, 100);
 		money = 100;
 #endif
 	}
