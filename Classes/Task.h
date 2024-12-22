@@ -3,7 +3,9 @@
 
 #include <string>
 #include <memory>
+#include "Resident.h"
 
+// 前向声明 Resident
 class Resident;
 
 enum class RewardType { Gold, Reputation, Item }; // 奖励类型
@@ -18,6 +20,7 @@ public:
     void completeTask(Resident* resident); // 完成任务
     std::string getDescription() const; // 获取任务描述
     RewardType getRewardType() const;  // 获取奖励类型
+    int getReward() const;             // 获取奖励数值
 
 private:
     // 创建对象
