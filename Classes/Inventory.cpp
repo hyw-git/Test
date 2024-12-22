@@ -15,7 +15,7 @@ bool Inventory::Add_Item(int id, int sum)
 		else
 			return false;
 	}
-		
+
 	else {
 		if (storage[site].num == maxsize && cus != max_size) {
 			storage[cus].ID = id;
@@ -28,14 +28,14 @@ bool Inventory::Add_Item(int id, int sum)
 			return true;
 		}
 		else
-			return false;		
+			return false;
 	}
 }
 
 int Inventory::Check_Item(int id)
 {
 	int site = -1;
-	for (int i = 0; i < storage.size(); ++i)                    //遍历所有物品堆，查看是否有所寻找物品
+	for (int i = 0; i < cus; ++i)
 	{
 		if (storage[i].ID == id)
 			site = i;
@@ -52,4 +52,16 @@ bool Inventory::Remove_Item(int id)
 		storage[status].num--;
 		return true;
 	}
+}
+
+int Inventory::Get_cus() {
+	return cus;
+}
+
+bool Inventory::Get_Message(int site, int& id, int& num) {
+	if (site >= cus)
+		return false;
+	id = storage[site].ID;
+	num = storage[site].num;
+	return true;
 }

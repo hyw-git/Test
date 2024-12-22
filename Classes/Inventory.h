@@ -22,8 +22,10 @@ private:
 	int maxsize;                            //用于存储每一堆的最大容量
 public:
 	Inventory(): cus(0), max_size(99), maxsize(999), storage(CAPACITY_OF_STORAGE_IN_INVENTORY){}
-    bool Add_Item(int id, int sum = 1);
-	int Check_Item(int id);
-	bool Remove_Item(int id);
+	bool Add_Item(int id, int sum = 1);     //加入物品
+	int Check_Item(int id);                 //查找物品
+	bool Remove_Item(int id);               //移除物品
+	int Get_cus();                          //返回当前占用的格子数
+	bool Get_Message(int site, int& id, int& num);   //获取物品信息
 };
 #endif // !__INVENTORY_H__
