@@ -1,45 +1,36 @@
-#ifndef __NPC_H__
-#define __NPC_H__
+#ifndef NPC_H
+#define NPC_H
 
-#include "cocos2d.h"
+#include "cocos2d.h" // 包含 Cocos2d 的头文件
 #include <string>
 #include <vector>
 
-class NPC : public cocos2d::Node {
-public:
-    NPC(const std::string& npcName, const std::vector<std::string>& npcDialogues)
-        : m_name(npcName), m_dialogues(npcDialogues), m_currentDialogueIndex(0), m_dialogueLabel(nullptr), npcSprite(nullptr) {
-    }
-    virtual ~NPC();                           // 析构函数
+USING_NS_CC; 
 
-    // 创建 NPC 对象
+class NPC : public Node {
+public:
+    NPC();
+    virtual ~NPC();
+
+    // 创建 NPC 对象的静态方法
     static NPC* create(const std::string& name, const std::string& spritePath, const std::vector<std::string>& dialogues);
 
-    // 初始化 NPC 对象
-    bool init(const std::string& name, const std::string& spritePath, const std::vector<std::string>& dialogues);
+    // 初始化 NPC
+    virtual bool init(const std::string& name, const std::string& spritePath, const std::vector<std::string>& dialogues);
 
-    // 对话相关功能
-    std::string getCurrentDialogue() const;    // 获取当前对话
-    void advanceDialogue();                    // 推进到下一句对话
-    void resetDialogue();                      // 重置对话（回到第一句）
+    // 获取当前对话内容
+    std::string getCurrentDialogue() const;
 
-    // 设置精灵的位置
-    void setSpritePosition(const cocos2d::Vec2& position);
-
-    // 获取 NPC 名称
- //   std::string getName() const;
+    // 对话相关方法
+    void advanceDialogue(); // 推进对话
+    void resetDialogue();   // 重置对话
+    void jumpToDialogue(int index); // 跳转到指定对话
 
 private:
-    
-
-    void createTouchListener();               // 创建触摸事件监听器
-    void updateDialogueUI();                  // 更新对话 UI 显示
-
-    std::string m_name;                       // NPC 名称
-    cocos2d::Sprite* m_sprite;                // NPC 精灵
-    cocos2d::Label* m_dialogueLabel;          // 显示对话的标签
-    std::vector<std::string> m_dialogues;     // 对话内容集合
-    int m_currentDialogueIndex;               // 当前对话的索引
+    std::string m_name; // NPC 名称
+    Sprite* m_sprite;   // NPC 的精灵对象
+    std::vector<std::string> m_dialogues; // 对话内容列表
+    size_t m_currentDialogueIndex; // 当前对话的索引
 };
 
-#endif // __NPC_H__
+#endif // NPC_H
