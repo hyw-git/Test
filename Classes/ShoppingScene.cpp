@@ -128,6 +128,8 @@ void ShoppingScene::buyItem(Ref* pSender)
 		prices[nowSelected] <= tmpMoney)
 	{
 		shopgoods.Remove_Item(nowSelected);//ø‚¥Êºı1
+		Character::getInstance().Remove_Item(MONEY, prices[nowSelected]);
+		Character::getInstance().Get_Item(nowSelected + 10);
 		if(shopgoods.Check_Item(nowSelected) == -1)//√ª”–ø‚¥Ê
 		{
 			toggles[nowSelected]->setSelectedIndex(2);//œ‘ æsold outÕº∆¨
