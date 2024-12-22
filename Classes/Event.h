@@ -1,118 +1,171 @@
-#ifndef EVENT_H
-#define EVENT_H
+#include "Resident.h"
+#include "CommunitySystem.h"
+#include "GameTime.h"
 
-#include "cocos2d.h"
-#include <string>
-#include <functional>
+Resident* Resident::create(const std::string& name, bool isMarriable) {
+    Resident* resident = new (std::nothrow) Resident();
+    if (resident && resident->init(name, isMarriable)) {
+        resident->autorelease();
+        return resident;
+    }
+    delete resident;
+    return nullptr;
+}
 
-enum class EventType {
-    TIME_TRIGGER,    // 时间触发事件
-    NPC_INTERACTION, // NPC交互事件
-    SCENE_CHANGE,    // 场景切换事件
-    LOVE_EVENT,      // 恋爱事件
-    CUSTOM           // 自定义事件
-};
-
-// Event 类（继承 cocos2d::Ref）
-class Event : public cocos2d::Ref {
-private:
-    std::string _eventId;                  // 事件唯一ID
-    EventType _type;                       // 事件类型
-    std::function<void()> _callback;       // 回调函数
-    float _triggerTime;                    // 触发时间（针对时间触发事件）
-    bool _isRecurring;                     // 是否是循环事件
-
-public:
-    // 构造函数
-    Event(const std::string& id, EventType type, std::function<void()> callback, float triggerTime = -1.0f, bool isRecurring = false)
-        : _eventId(id), _type(type), _callback(callback), _triggerTime(triggerTime), _isRecurring(isRecurring) {
+bool Resident::init(const std::string& name, bool isMarriable) {
+    if (!Node::init()) {
+        return false;
     }
 
-    // 静态创建函数
-    static Event* create(const std::string& id, EventType type, std::function<void()> callback, float triggerTime = -1.0f, bool isRecurring = false) {
-        Event* event = new Event(id, type, callback, triggerTime, isRecurring);
-        if (event) {
-            event->autorelease();
-            return event;
-        }
-        CC_SAFE_DELETE(event);
-        return nullptr;
+    this->name = name;
+    this->isMarriable = isMarriable;
+    this->friendshipPoints = 0;
+    this->heartLevel = 0;
+    this->heartEventTriggered = false;
+    this->status = RelationshipStatus::FRIEND;
+    this->Gold = 0;
+    this->Reputation = 0;
+
+    taskTemplates.push_back(std::make_shared<Task>("收集石头", 100, 10, RewardType::Gold));
+    taskTemplates.push_back(std::make_shared<Task>("修理工具", 150, 5, RewardType::Reputation));
+    taskTemplates.push_back(std::make_shared<Task>("送货到居民", 200, 3, RewardType::Item));
+
+    return true;
+}
+
+// 创建任务
+std::shared_ptr<Task> Resident::createTask() {
+    if (!taskTemplates.empty()) {
+        int index = rand() % taskTemplates.size();
+        return taskTemplates[index];
     }
+    return nullptr;
+}
 
-    // 获取事件ID
-    const std::string& getId() const { return _eventId; }
-
-    // 获取事件类型
-    EventType getType() const { return _type; }
-
-    // 获取触发时间
-    float getTriggerTime() const { return _triggerTime; }
-
-    // 判断是否为循环事件
-    bool isRecurring() const { return _isRecurring; }
-
-    // 执行事件
-    void execute() {
-        if (_callback) {
-            _callback();
-        }
+// 提供任务到任务系统
+void Resident::offerTaskToSystem(CommunitySystem* system) {
+    auto task = createTask();
+    if (task) {
+        system->addTask(task);
+        CCLOG("%s 提供了任务：%s", name.c_str(), task->getDescription().c_str());
     }
-};
-
-// EventManager 类
-class EventManager : public cocos2d::Ref {
-private:
-    cocos2d::Map<std::string, Event*> _events; // 用 Map 存储所有事件
-
-public:
-    // 静态创建函数
-    static EventManager* create() {
-        EventManager* manager = new EventManager();
-        if (manager) {
-            manager->autorelease();
-            return manager;
-        }
-        CC_SAFE_DELETE(manager);
-        return nullptr;
+    else {
+        CCLOG("%s 没有可用任务提供", name.c_str());
     }
+}
 
-    // 添加事件
-    void addEvent(Event* event) {
-        if (event) {
-            _events.insert(event->getId(), event);
-        }
+// 完成任务
+void Resident::completeTask(std::shared_ptr<Task> task) {
+    if (task->isCompleted()) {
+        int reward = task->getReward();
+        updateFriendship(reward);
+        CCLOG("%s 完成任务：%s", name.c_str(), task->getDescription().c_str());
     }
+}
 
-    // 移除事件
-    void removeEvent(const std::string& id) {
-        _events.erase(id);
+// 更新友好度
+void Resident::updateFriendship(int points) {
+    friendshipPoints += points;
+    int maxFriendship = (status == RelationshipStatus::SPOUSE) ? 3500 : 2500;
+    friendshipPoints = std::max(0, std::min(friendshipPoints, maxFriendship));
+    heartLevel = friendshipPoints / 250;
+
+    if (heartLevel >= 8 && !heartEventTriggered) {
+        heartEventTriggered = true;
+        CCLOG("%s 的特殊剧情触发！", name.c_str());
     }
+}
 
-    // 手动触发事件
-    void triggerEvent(const std::string& id) {
-        if (_events.find(id) != _events.end()) {
-            _events.at(id)->execute();
-        }
-    }
+// 赠送花束
+bool Resident::offerBouquet() {
+    if (heartLevel >= 8 && status == RelationshipStatus::FRIEND) {
+        status = RelationshipStatus::ROMANTIC; // 进入恋爱关系
 
-    // 根据时间触发事件
-    void triggerTimeEvents(float currentTime) {
-        auto keysToRemove = cocos2d::Vector<std::string>();
-        for (const auto& pair : _events) {
-            Event* event = pair.second;
-            if (event->getType() == EventType::TIME_TRIGGER && event->getTriggerTime() <= currentTime) {
-                event->execute();
-                if (!event->isRecurring()) {
-                    keysToRemove.pushBack(pair.first);
-                }
-            }
+        auto bouquetSprite = cocos2d::Sprite::create("bouquet.png");
+        if (bouquetSprite) {
+            CCLOG("花束图片加载成功！");
         }
 
-        // 移除非循环事件
-        for (const auto& key : keysToRemove) {
-            _events.erase(key);
+        CCLOG("%s 接受了花束，现在处于恋爱关系。", name.c_str());
+        return true;
+    }
+    CCLOG("%s 无法接受花束。", name.c_str());
+    return false;
+}
+
+// 赠送美人鱼吊坠
+bool Resident::offerMermaidPendant() {
+    if (heartLevel == 10 && status == RelationshipStatus::ROMANTIC) {
+        status = RelationshipStatus::SPOUSE; // 成为配偶
+
+        auto pendantSprite = cocos2d::Sprite::create("Mermaid's_Pendant.png");
+        if (pendantSprite) {
+            CCLOG("美人鱼吊坠图片加载成功！");
+        }
+
+        CCLOG("%s 接受了美人鱼吊坠并与你结婚！", name.c_str());
+        return true;
+    }
+    CCLOG("%s 无法接受美人鱼吊坠。", name.c_str());
+    return false;
+}
+
+// 查询是否处于恋爱关系
+bool Resident::isRomantic() const {
+    return status == RelationshipStatus::ROMANTIC;
+}
+
+// 查询是否已结婚
+bool Resident::isSpouse() const {
+    return status == RelationshipStatus::SPOUSE;
+}
+
+// 接受礼物
+void Resident::acceptGift(const std::string& giftName, GiftPreference preference) {
+    int friendshipChange = 0;
+
+    switch (preference) {
+    case GiftPreference::LOVE:
+        friendshipChange = 80;
+        break;
+    case GiftPreference::LIKE:
+        friendshipChange = 50;
+        break;
+    case GiftPreference::NEUTRAL:
+        friendshipChange = 20;
+        break;
+    case GiftPreference::DISLIKE:
+        friendshipChange = -20;
+        break;
+    case GiftPreference::HATE:
+        friendshipChange = -50;
+        break;
+    }
+
+    updateFriendship(friendshipChange);
+    CCLOG("%s 接受了礼物：%s，友好度变化：%d", name.c_str(), giftName.c_str(), friendshipChange);
+}
+
+// 参与节日
+void Resident::participateInFestival(const std::string& festivalName) {
+    updateFriendship(100); // 增加节日参与奖励
+    CCLOG("%s 正在参与节日：%s", name.c_str(), festivalName.c_str());
+}
+
+// 更新居民日程
+void Resident::updateSchedule(int currentHour) {
+    for (const auto& schedule : dailySchedule) {
+        if (currentHour >= schedule.startHour && currentHour < schedule.endHour) {
+            CCLOG("%s 当前活动：%s", name.c_str(), schedule.activity.c_str());
+            break;
         }
     }
-};
+}
 
-#endif // EVENT_H
+void Resident::addGold(int gold) {
+    Gold += gold;
+}
+
+void Resident::addReputation(int reputation) {
+    Reputation += reputation;
+}
