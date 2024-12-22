@@ -2,52 +2,69 @@
 #define RESIDENT_H
 
 #include "cocos2d.h"
-#include <string>
-#include <map>
-#include <vector>
 #include "Task.h"
+#include <string>
+#include <vector>
+#include <memory>
+
+// 礼物偏好
+enum class GiftPreference {
+    LOVE, LIKE, NEUTRAL, DISLIKE, HATE
+};
+
+// 恋爱和婚姻状态
+enum class RelationshipStatus {
+    FRIEND,    // 普通朋友
+    ROMANTIC,  // 恋爱关系
+    SPOUSE     // 配偶
+};
+
+// 居民日程安排
+struct Schedule {
+    cocos2d::Vec2 location; // 活动位置
+    int startHour;          // 开始时间
+    int endHour;            // 结束时间
+    std::string activity;   // 活动内容
+};
+
+class CommunitySystem;
 
 class Resident : public cocos2d::Node {
 public:
-    static Resident* create(const std::string& name, bool isSingle);
+    static Resident* create(const std::string& name, bool isMarriable);
+    virtual bool init(const std::string& name, bool isMarriable);
 
-    virtual bool init(const std::string& name, bool isSingle);
+    // 任务相关
+    std::shared_ptr<Task> createTask();               // 创建任务
+    void offerTaskToSystem(CommunitySystem* system); // 提供任务到任务系统
+    void completeTask(std::shared_ptr<Task> task);   // 完成任务
 
-    // 社交功能
-    void interact();                                 // 与居民交谈
-    void giveGift(const std::string& giftType);      // 赠送礼物
-    void updateFriendship(int points);              // 更新友谊值
-    void reduceFriendship(int points);              // 减少友谊值
-    void triggerHeartEvent();                       // 解锁爱心事件
+    // 社交相关
+    void participateInFestival(const std::string& festivalName); // 参与节日
+    void updateFriendship(int points);                          // 更新友好度
+    bool offerBouquet();                                         // 赠送花束
+    bool offerMermaidPendant();                                  // 赠送美人鱼吊坠（结婚）
+    void triggerRomanticEvent();         // 触发浪漫事件
+    // 状态查询
+    bool isRomantic() const;                         // 是否处于恋爱关系
+    bool isSpouse() const;                           // 是否已结婚
+    int getFriendshipPoints() const;                 // 获取当前友谊值
+    int getHeartLevel() const;                       // 获取心等级
 
-    // 任务功能
-    void assignTask(Task* task);                    // 给居民分配任务
-    void completeTask(Task* task);                  // 玩家完成任务，居民给予奖励
-    void showTasks() const;                         // 显示当前任务列表
-    bool hasPendingTasks() const;                   // 检查是否有未完成的任务
-
-    // 行为功能
-    void updateBehavior(int hour);                  // 根据时间更新行为
-    void moveToLocation(const cocos2d::Vec2& position); // 移动到指定位置
-
-    // 获取状态
-    int getFriendshipPoints() const;                // 当前友谊值
-    int getHeartLevel() const;                      // 爱心等级
-    bool canRomance() const;                        // 是否可以发展浪漫关系
-    bool canMarry() const;                          // 是否可以结婚
-
-    CREATE_FUNC(Resident);
-
+    // 日程相关
+    void updateSchedule(int currentHour); // 更新居民日程
+    // 礼物相关
+    void acceptGift(const std::string& giftName, GiftPreference preference);
 private:
-    std::string name;                               // 居民名称
-    bool isSingle;                                  // 是否为单身居民
-    int friendshipPoints;                           // 友谊值
-    int heartLevel;                                 // 爱心等级
-    bool heartEventTriggered;                       // 是否触发爱心事件
-    std::map<std::string, int> giftPreferences;     // 礼物偏好表
-    int weeklyGiftCount;                            // 每周礼物计数
-    bool inRomanticRelationship;                    // 是否处于浪漫关系
-    std::vector<Task*> tasks;                       // 居民的任务列表
+    std::string name; // 居民姓名
+    bool isMarriable; // 是否可结婚
+    int friendshipPoints; // 好感度
+    int heartLevel;       // 心等级
+    RelationshipStatus status; // 当前关系状态
+    bool heartEventTriggered;  // 是否触发特殊剧情
+
+    std::vector<std::shared_ptr<Task>> taskTemplates; // 任务模板
+    std::vector<Schedule> dailySchedule;             // 日程安排
 };
 
 #endif // RESIDENT_H
