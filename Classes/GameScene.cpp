@@ -17,34 +17,10 @@ bool GameScene::init() {
     }
 
     // 初始化游戏时间
-    GameTime::getInstance()->start(); // 开始时间流逝
+    GameTime::getInstance()->start(); // 启动游戏时间管理
 
-    // 添加节日事件到社区系统
-    Event* festival = new Event("Festival", "A special event to increase friendship.", "Day1", true);
-    communitySystem.addEvent(festival);
-
-    Event* market = new Event("Market", "Residents exchange goods.", "Day2", false);
-    communitySystem.addEvent(market);
-
-    // 添加居民到社区系统
-    Resident* resident1 = Resident::create("Resident1", true);  // 示例居民1
-    Resident* resident2 = Resident::create("Resident2", false); // 示例居民2
-    communitySystem.addNPC(resident1);
-    communitySystem.addNPC(resident2);
-
-    // 创建任务并分配给居民
-    Task* task = new Task("Generic Task", 100, 10); // 示例任务：收集10个物品
-    communitySystem.assignTaskToResident(resident1, task);
-
-    // 将居民添加到场景
-    this->addChild(resident1);
-    this->addChild(resident2);
-
-    // 与所有居民进行交互
-    communitySystem.interactWithAllResidents();
-
-    // 如果有节日活动，触发节日事件
-    communitySystem.triggerFestival();
+    // 初始化社区系统（居民、节日等）
+    initializeCommunity();
 
     // 启用每帧更新
     this->scheduleUpdate();
@@ -52,41 +28,75 @@ bool GameScene::init() {
     return true;
 }
 
+void GameScene::initializeCommunity() {
+    // 添加节日事件到社区系统
+    communitySystem.addEvent(std::make_shared<Event>("Festival", "A special event to increase friendship.", "Day1", true));
+    communitySystem.addEvent(std::make_shared<Event>("Market", "Residents exchange goods.", "Day2", false));
+    communitySystem.addEvent(std::make_shared<Event>("Harvest Festival", "Celebrate the harvest.", "Day7", true));
+
+    // 添加居民到社区系统
+    auto alex = Resident::create("Alex", true); // 创建居民 Alex
+    alex->setTexture("NPC/Alex.png");           // 设置 Alex 的头像
+    communitySystem.addNPC(alex);               // 添加 Alex 到社区系统
+    this->addChild(alex);                       // 将 Alex 添加到场景
+
+    auto abigail = Resident::create("Abigail", true); // 创建居民 Abigail
+    abigail->setTexture("NPC/Abigail.png");           // 设置 Abigail 的头像
+    communitySystem.addNPC(abigail);                 // 添加 Abigail 到社区系统
+    this->addChild(abigail);                         // 将 Abigail 添加到场景
+
+    alex->offerTaskToPlayer(player);    // Alex 生成并提供任务
+    abigail->offerTaskToPlayer(player); // Abigail 生成并提供任务
+}
+
 void GameScene::update(float dt) {
+    // 更新游戏日程和事件
+    updateGameDay();
+
+    // 更新任务进度
+    updateTaskProgress();
+}
+
+void GameScene::updateGameDay() {
     // 获取当前游戏时间
-    GameTime* gameTime = GameTime::getInstance();
-    std::string formattedTime = gameTime->getFormattedTime(); // 获取当前时间字符串（如 "06:00"）
+    auto gameTime = GameTime::getInstance();
 
     // 检查一天是否结束
     if (gameTime->isDayOver()) {
-        CCLOG("Day over! Setting to next day...");
-        gameTime->setNextDay(); // 设置为第二天的早晨 6 点
+        CCLOG("一天结束，进入下一天...");
+        gameTime->setNextDay(); // 进入下一天
     }
 
-    // 在新的一天开始时触发事件
-    if (gameTime->hour == 6 && gameTime->minute == 0) { // 检查是否为新的一天
-        std::string currentDay = getDayFromTime(); // 根据时间映射获取当前游戏中的日期
-        communitySystem.triggerEventsForToday(currentDay); // 触发当天的事件
+    // 触发新的一天的事件
+    if (gameTime->hour == 6 && gameTime->minute == 0) {
+        currentDate = getDayFromTime(); // 获取当前游戏日期
+        communitySystem.triggerEventsForToday(currentDate); // 触发当天事件
     }
+}
 
-    // 模拟物品收集和任务进度更新
-    for (auto& resident : communitySystem.getNPCs()) {
-        for (auto& task : resident->getTasks()) {
-            task->updateProgress(1); // 增加任务进度，每次增加 1
+void GameScene::updateTaskProgress() {
+    // 遍历所有居民，更新任务进度
+    for (const auto& resident : communitySystem.getNPCs()) {
+        for (const auto& task : resident->getTasks()) {
+            task->updateProgress(1); // 每帧增加任务进度
             if (task->isCompleted()) {
-                resident->completeTask(task); // 如果任务完成，触发奖励逻辑
+                resident->completeTask(task); // 如果任务完成，处理奖励
             }
         }
     }
 }
 
-// 帮助函数：根据时间获取对应的游戏日
 std::string GameScene::getDayFromTime() {
-    int dayIndex = GameTime::getInstance()->hour / 6; // 将每 6 小时映射为一天的周期
-    switch (dayIndex) {
+    // 将游戏时间映射为日期
+    int dayIndex = GameTime::getInstance()->getCurrentDayIndex();
+    switch (dayIndex % 7) { // 循环 7 天的周期
     case 0: return "Day1";
     case 1: return "Day2";
     case 2: return "Day3";
-    default: return "Day1"; // 默认返回 Day1
+    case 3: return "Day4";
+    case 4: return "Day5";
+    case 5: return "Day6";
+    case 6: return "Day7";
+    default: return "Day1";
     }
 }
