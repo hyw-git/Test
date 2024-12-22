@@ -1,7 +1,7 @@
 #include "EscScene.h"
 #include "Def.h"
 #include "SimpleAudioEngine.h"
-
+#include "Settings.h"
 USING_NS_CC;
 
 //创建一个登录场景
@@ -53,7 +53,11 @@ bool Esc::init()
     menuEnd->setScale(1.5);
     menuEnd->setPosition(visibleSize.width / 2 + origin.x + 100, 200);
 
-    auto menu = Menu::create(menuStart, menuEnd, NULL);
+    auto settingsItem = MenuItemImage::create("SettingsNormal.png", "SettingsSelected.png", CC_CALLBACK_1(Esc::enterSettings, this));
+    settingsItem->setScale(1.5);
+    settingsItem->setPosition(settingsItem->getContentSize().width, settingsItem->getContentSize().height);
+
+    auto menu = Menu::create(menuStart, menuEnd, settingsItem,NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu);
     return true;
@@ -72,4 +76,10 @@ void Esc::continueGame(Ref* obj) {
 //end game
 void Esc::endGame(Ref* obj) {
     Director::getInstance()->end();
+}
+
+void Esc::enterSettings(Ref* obj)
+{
+    auto setscene = Settings::createSettingsScene();
+    Director::getInstance()->pushScene(TransitionMoveInB::create(0.5, setscene));
 }

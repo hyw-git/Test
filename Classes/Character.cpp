@@ -31,3 +31,13 @@ bool Character::Has_Seed() {
 bool Character::Has_Sickle() {
 	return (inventory.Check_Item(SICKLE) != -1);
 }
+
+int Character::get_money()
+{
+	return money;
+}
+
+void Character::set_money(int _Money)
+{
+	money = _Money;
+}

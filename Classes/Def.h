@@ -21,3 +21,5 @@
 #define K_E  EventKeyboard::KeyCode::KEY_E
 #define K_B  EventKeyboard::KeyCode::KEY_B
 #define K_ESC EventKeyboard::KeyCode::KEY_ESCAPE
+
+#define CAPACITY_OF_STORAGE_IN_INVENTORY 999

@@ -10,6 +10,7 @@ public:
     virtual bool init();                     //场景初始化
     void continueGame(Ref* obj);                //开始按钮
     void endGame(Ref* obj);                  //结束按钮
+    void enterSettings(Ref* obj);            //设置按钮
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
 

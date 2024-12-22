@@ -1,6 +1,7 @@
 #include "GamebeginScene.h"
 #include "MyMap.h"
 #include "SimpleAudioEngine.h"
+#include "Settings.h"
 
 USING_NS_CC;
 
@@ -53,7 +54,15 @@ bool GameBegin::init()
     menuEnd->setScale(1.5);
     menuEnd->setPosition(visibleSize.width / 2 + origin.x + 100, 200);
 
-    auto menu = Menu::create(menuStart, menuEnd, NULL);
+    auto settingsItem = MenuItemImage::create("SettingsNormal.png", "SettingsSelected.png", CC_CALLBACK_1(GameBegin::enterSettings, this));
+    settingsItem->setScale(1.5);
+    settingsItem->setPosition(settingsItem->getContentSize().width, settingsItem->getContentSize().height);
+
+    /*auto ReadFileItem = MenuItemImage::create("ReadFileNormal.png", "ReadFileSelected.png", CC_CALLBACK_1(GameBegin::readFileToStartGame, this));
+    ReadFileItem->setScale(1.5);
+    ReadFileItem->setPosition(visibleSize.width / 2 + origin.x - 200, 200);*/
+
+    auto menu = Menu::create(menuStart, menuEnd, settingsItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu);
     return true;
@@ -74,4 +83,18 @@ void GameBegin::startGame(Ref* obj) {         //ÇÐ»»³¡¾°
 //end game
 void GameBegin::endGame(Ref* obj) {
     Director::getInstance()->end();
+}
+
+void GameBegin::enterSettings(Ref* obj)
+{
+    auto setscene = Settings::createSettingsScene();
+    Director::getInstance()->pushScene(TransitionMoveInB::create(0.5, setscene));
+}
+
+void GameBegin::readFileToStartGame(Ref* obj)
+{
+#define READ_FILE
+    auto scene = MyMap::createMapScene();
+    Director::getInstance()->replaceScene
+    (TransitionCrossFade::create(1, scene));
 }
