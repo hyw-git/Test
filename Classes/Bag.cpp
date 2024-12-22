@@ -111,6 +111,30 @@ bool Bag::init()
                 myLabel->setVisible(true);
                 this->addChild(myLabel);
             }
+            else if (id == EGG) {                        //egg的有关显示信息
+                auto item = Sprite::create("egg.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
+            else if (id == CHICKEN) {                        //chicken的有关显示信息
+                auto item = Sprite::create("chicken.png");
+                item->setAnchorPoint(Vec2(0.5, 0.5));
+                item->setScale(2);
+                item->setPosition(init_x, init_y);
+                this->addChild(item);
+
+                auto myLabel = Label::createWithSystemFont(std::to_string(num), "Arial", 20);
+                myLabel->setPosition(Vec2(init_x_num, init_y_num));
+                myLabel->setVisible(true);
+                this->addChild(myLabel);
+            }
         }
     }
 

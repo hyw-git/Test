@@ -36,6 +36,7 @@ public:
 	bool Has_Seed();
 	bool Has_Sickle();
 	bool Has_Stone();
+	bool Has_CROP(int num);
 
 	float get_speed();                          //获取角色移动属性
 	void set_speed(float speed);                //设置角色移动属性

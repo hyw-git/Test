@@ -12,6 +12,8 @@
 #define ROOM_DOOR 904         //室内门
 #define DOOR 2698             //室外门
 #define COM 949               //合成
+#define EGG 25                //鸡蛋
+#define CHICKEN 5040
 
 //各种key
 #define K_W  EventKeyboard::KeyCode::KEY_W
@@ -23,4 +25,5 @@
 #define K_E  EventKeyboard::KeyCode::KEY_E
 #define K_B  EventKeyboard::KeyCode::KEY_B
 #define K_Q  EventKeyboard::KeyCode::KEY_Q
+#define K_L  EventKeyboard::KeyCode::KEY_L
 #define K_ESC EventKeyboard::KeyCode::KEY_ESCAPE

@@ -63,6 +63,7 @@ public:
     void Room();                       //进入房间
 
     void onCropMature(float dt);       //作物生长
+    void Set_Feed_Status(float dt);    //重置饲喂冷却
     void Ani_A();                      //左移帧动画
     void Ani_D();                      //右移帧动画
     void Ani_W();                      //上移帧动画
