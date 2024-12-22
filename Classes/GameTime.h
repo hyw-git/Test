@@ -2,7 +2,6 @@
 #define GAMETIME_H
 
 #include "cocos2d.h"
-#include "Archive.h"
 #include <string>
 
 class GameTime : public cocos2d::Node {
@@ -26,19 +25,21 @@ public:
     std::string judgeTime() const;           // 判断当前时间段（如早晨、下午）
     bool isDayOver() const;                  // 判断是否为凌晨 2 点
 
-    CREATE_FUNC(GameTime);                   // 使用 Cocos2d-x 的工厂函数创建实例
+    CREATE_FUNC(GameTime);                 
 
 private:
-    GameTime();                              // 私有构造函数，防止外部创建
-    void normalizeTime();                    // 校正时间（分钟进位、小时重置）
-    void updateTime(float dt);               // 按时间流速更新时间
+    // 私有构造函数，防止外部创建
+    GameTime() : hour(6), minute(0), running(false), timeSpeed(0.7f) {}
 
     // 成员变量
     int hour;                                // 当前小时（0-23）
     int minute;                              // 当前分钟（0-59）
     bool running;                            // 时间是否在流逝
     float timeSpeed;                         // 时间流逝速度（现实 0.7 秒 = 游戏 1 分钟）
+
+    // 内部方法
+    void normalizeTime();                    // 校正时间（分钟进位、小时重置）
+    void updateTime(float dt);               // 按时间流速更新时间
 };
 
 #endif // GAMETIME_H
-
