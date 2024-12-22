@@ -1,35 +1,72 @@
 #include "CommunitySystem.h"
-#include "Resident.h"
-#include "cocos2d.h"
+#include "GameTime.h"
 
-void CommunitySystem::addNPC(Resident* resident) {
-    npcs.push_back(resident); // 将居民添加到系统中
+static CommunitySystem* instance = nullptr;
+
+// 单例模式获取实例
+CommunitySystem* CommunitySystem::getInstance() {
+    if (!instance) {
+        instance = new CommunitySystem();
+        instance->initializeFestivals();
+        instance->initializeTaskTemplates();
+    }
+    return instance;
 }
 
-void CommunitySystem::interactWithAllResidents() {
-    for (auto resident : npcs) {
-        resident->interact(); // 与所有居民进行交互
+// 更新所有居民的状态
+void CommunitySystem::updateAllResidents() {
+    int currentHour = GameTime::getInstance()->getCurrentHour();
+
+    for (auto& resident : residents) {
+        resident->updateSchedule(currentHour);
+
+        // 自动检查并更新任务状态
+        resident->updateTaskProgress();
     }
 }
 
-void CommunitySystem::triggerFestival() {
-    for (auto resident : npcs) {
-        resident->updateFriendship(20); // 节日活动增加友谊值
-    }
-}
+// 检查并触发节日
+void CommunitySystem::checkAndTriggerFestivals(const std::string& currentSeason, int currentDay) {
+    if (currentFestival) return; // 如果已经有节日进行中，则直接返回
 
-void CommunitySystem::addEvent(Event* event) {
-    events.push_back(event); // 添加节日活动
-}
+    for (const auto& festival : festivals) {
+        if (festival.season == currentSeason && festival.day == currentDay) {
+            currentFestival = std::make_shared<Festival>(festival);
 
-void CommunitySystem::triggerEventsForToday(const std::string& currentDate) {
-    for (auto event : events) {
-        if (event->getDate() == currentDate) {
-            event->triggerEvent(); // 触发今天的活动
+            // 通知所有居民参与节日
+            for (auto& resident : residents) {
+                resident->participateInFestival(currentFestival->name);
+            }
+
+            CCLOG("节日 %s 开始了！", currentFestival->name.c_str());
+            break;
         }
     }
 }
 
-void CommunitySystem::assignTaskToResident(Resident* resident, Task* task) {
-    resident->assignTask(task); // 给居民分配任务
+// 生成每日任务（按需创建）
+void CommunitySystem::generateDailyTasks() {
+    availableTasks.clear();
+
+    // 遍历居民，根据需求生成任务
+    for (const auto& resident : residents) {
+        auto task = resident->createTask();
+        if (task) {
+            availableTasks.push_back(task);
+        }
+    }
+}
+
+// 分配任务
+void CommunitySystem::assignRandomTask(Resident* resident) {
+    if (availableTasks.empty()) {
+        generateDailyTasks(); // 如果没有任务可用，则生成每日任务
+    }
+
+    if (!availableTasks.empty()) {
+        int index = rand() % availableTasks.size();
+        auto task = availableTasks[index];
+        resident->assignTask(task);
+        availableTasks.erase(availableTasks.begin() + index); // 移除已分配任务
+    }
 }
