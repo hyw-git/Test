@@ -15,6 +15,9 @@
  <tileset firstgid="4224" name="object" tilewidth="32" tileheight="32" tilecount="816" columns="24">
   <image source="object.png" width="768" height="1088"/>
  </tileset>
+ <tileset firstgid="5040" name="animal" tilewidth="32" tileheight="32" tilecount="28" columns="4">
+  <image source="animal.png" width="128" height="226"/>
+ </tileset>
  <layer name="layer0" width="50" height="50">
   <data encoding="base64" compression="zlib">
    eJztmUtOwzAQhr0CknbNltcleF2Cl0Bs2l4AgdhUCA4AYkOLOASPW0BPkSvwugG/RSxGxs3DjZNx5MWnVlHUzlePZ8bpMBJiWDMJYdo97x0hPsAn+ALfnfrjrMJjrivEPFgAEYi7zcdt47GEuJfBClgFa556rCPuDbAJtsC2px47iHsX7IF9cOCpR6A57sAIXIJ7BvHYIHPrETylvDCIqUqPQ/S9IwPHDPuhwuRxinjPDJx75JEEj8botcRDrcdzShs82rIetF5dI94bA7eeefiIvj96DGIyYYqrn+Ehr3Hs53QOVFwRxtH/vOK0z1X8NM48OHrQ/VsEmldcPAbRX59Wuf9agAkzD7UeyuMi+j0j9Q33ma658DiJ0YNS5HsbD5ozRXDhYXNeo/OfySOvR7jo59RD5sdIQ9bRB8P18Qzr4TLP82qNCa4eRWoO5Y28ylo0YOChao7NZ3CYmdrwXCbLQ5/lOD+TyfLQazzns1rw4Mc0D73ncj47Z3n4Rhs9ZC/Uz6U2NPE/R5H5qixNrGtbPcrOiqbZcVLi+5MMZtkfdf+OLjxc5sNinE9VeRU8gkdVHnURPIT4AU+BHfw=
@@ -28,6 +31,11 @@
  <layer name="layer2" width="50" height="50">
   <data encoding="base64" compression="zlib">
    eJzt1kEOgjAQBdAeoeW47gw30IQDgBt3nEdvgQdQiRKrNGQsg/3F/5ImGGOY33ZqjclfbdO+/1QYcy7if5+6/kF3z3CJyNE86z+A5JijXkGWfj38QfiuXCciIiIiaEf3eq7s+2fKy9aOR46YQ8dGqZe/zdEGvi8FtWjVm4rk7EQ4X/151q6nyrRXEUh6BBnC3qaxpdcFad/u3WNIof7n7Bz23Ud6zody9PcDf/hQ1yNkKkcqMb2ImGMJn3Mj2cOx9xneg0jLmnuS6JfYS/QPbk0HNeo=
+  </data>
+ </layer>
+ <layer name="layer3" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt1EcRAAAIwDA84N8DEpHBuERBX40AAAAAACZVThcA21z7wrVeAAAA/mrILgJK
   </data>
  </layer>
 </map>

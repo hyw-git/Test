@@ -280,6 +280,27 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
             }
         }
         break;
+    case K_Q:
+        ly = mapTild->getLayer("layer3");
+        if (ly->getTileGIDAt(spriteCurPos, nullptr) == CHICKEN) {
+            if (chicken.Can_Feeded_Again && character.Has_CROP(2)) {
+                chicken.Feeded();
+                character.Remove_Item(CROP, chicken.GetAppetite());
+                scheduleOnce(schedule_selector(MyMap::Set_Feed_Status), 10.0);
+                if (chicken.Get_Egg(1)) {
+                    character.Get_Item(EGG, 1);
+                }
+            }   
+        }
+        break;
+    case K_L:
+        ly = mapTild->getLayer("layer3");
+        if (ly->getTileGIDAt(spriteCurPos, nullptr) == CHICKEN) {
+            if (chicken.Killed()) {
+                ly->removeTileAt(spriteCurPos);
+                character.Get_Item(CHICKEN, 2);
+            }
+        }
     }
     return;
 }
@@ -291,6 +312,11 @@ void MyMap::onCropMature(float dt) {
     cropX.erase(cropX.begin());
     cropY.erase(cropY.begin());
     ly->setTileGID(CROP, Pos);
+}
+
+//重置饲喂冷却
+void MyMap::Set_Feed_Status(float dt) {
+    chicken.Set_Feed_Status();
 }
 
 //记录键盘被松开

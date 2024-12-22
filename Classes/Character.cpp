@@ -49,3 +49,10 @@ bool Character::Has_Sickle() {
 bool Character::Has_Stone() {
 	return (inventory.Check_Item(STONE) != -1);
 }
+
+bool Character::Has_CROP(int num) {
+	int id;
+	int sum;
+	inventory.Get_Message(inventory.Check_Item(CROP), id, sum);
+	return (sum >= num);
+}
