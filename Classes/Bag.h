@@ -8,14 +8,13 @@ USING_NS_CC;
 class Bag : public cocos2d::Scene
 {
 private:
-    Character character;
+    Character& character = Character::getInstance(); //单例主角
 public:
-    Bag();
-    static cocos2d::Scene* createScene();    //创建地图场景
-    virtual bool init();                        //场景初始化
-    void close(Ref* obj);
+    static cocos2d::Scene* createScene();            //创建地图场景
+    virtual bool init();                             //场景初始化
+    void close(Ref* obj);                            //关闭背包
 
-    void menuCloseCallback(cocos2d::Ref* pSender);// a selector callback
-    CREATE_FUNC(Bag);                           // implement the "static create()" method manually
+    void menuCloseCallback(cocos2d::Ref* pSender);
+    CREATE_FUNC(Bag);
 };
 #endif

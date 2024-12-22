@@ -13,7 +13,6 @@ MyMap::MyMap() {
     run_D = false;
     run_W = false;
     run_S = false;
-    character = Character::getInstance();
     character.set_speed(40.0);
 }
 
@@ -39,26 +38,27 @@ bool MyMap::init()
     if (!Scene::init())
         return false;
     const auto winSize = Director::getInstance()->getWinSize();    //获取窗口尺寸
-    
-    //Add TMX map
+
+    //加入地图
     mapTild = TMXTiledMap::create("map.tmx");
     mapTild->setAnchorPoint(Vec2(0.5, 0.5));
     mapTild->setPosition(winSize.width / 2, winSize.height / 2);
     this->addChild(mapTild, 0);
-    
-    //Add sprite
+
+    //加入角色精灵
     _sprite = Sprite::create("character.png");
-    _sprite->setPosition(basic_size / 2 + winSize.width / 2, basic_size / 2  + winSize.height / 2);
+    _sprite->setPosition(basic_size / 2 + winSize.width / 2, basic_size / 2 + winSize.height / 2);
     addChild(_sprite, 1);
 
-    //更新获取sprite当前位置信息
-    CalcSite();                    
+    CalcSite();           //更新获取sprite当前位置信息
 
-    auto set = MenuItemImage::create("CloseNormal.png", "CloseSelected.png", CC_CALLBACK_1(MyMap::Set, this));
+    //鼠标交互的按钮设置
+    auto set = MenuItemImage::create("exitSettingsNormal.png", "exitSettingsSelected.png", CC_CALLBACK_1(MyMap::Set, this));
     auto hoe = MenuItemImage::create("hoe.png", "hoe.png", CC_CALLBACK_1(MyMap::Change_Hoe, this));
     auto seed = MenuItemImage::create("seed.png", "seed.png", CC_CALLBACK_1(MyMap::Change_Seed, this));
     auto sickle = MenuItemImage::create("sickle.png", "sickle.png", CC_CALLBACK_1(MyMap::Change_Sickle, this));
-    
+
+    //菜单位置设置
     set->setPosition(900, 600);
     hoe->setAnchorPoint(Vec2(0.5, 0.5));
     hoe->setPosition(winSize.width / 2 - 3.5 * basic_size, basic_size / 2);
@@ -95,7 +95,7 @@ bool MyMap::init()
 //更新当前主角在maptild中的位置
 void MyMap::CalcSite() {
     spriteCurPos = ccp((int)(_sprite->getPositionX() - mapTild->getPositionX()) / basic_size + 24,
-                       ((int)(mapTild->getPositionY() - _sprite->getPositionY() + basic_size / 2)) / basic_size + 25);
+        ((int)(mapTild->getPositionY() - _sprite->getPositionY() + basic_size / 2)) / basic_size + 25);
 }
 
 //判断每一帧的移动
@@ -114,7 +114,7 @@ void MyMap::update(float deltaTime) {
         if ((_sprite->getPositionX() < basic_size * 4) && (mapTild->getContentSize().width / 2 - mapTild->getPositionX()) > 30)
             mapTild->setPosition(mapTild->getPositionX() + character.get_speed() * deltaTime, mapTild->getPositionY());
         else if (_sprite->getPositionX() > 30) {
-            
+
             _sprite->setPosition(_sprite->getPositionX() - character.get_speed() * deltaTime, _sprite->getPositionY());
         }
     }
@@ -240,13 +240,13 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
         CalcSite();
         break;
     case K_D:               //向右移动
-        moveRight = true;   
+        moveRight = true;
         CalcSite();
         break;
-    case K_B:
+    case K_B:               //打开背包
         Bag();
         break;
-    case K_E:
+    case K_E:               //进入房间
         Room();
         break;
     case K_F:               //与场景物交互
@@ -255,12 +255,13 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
             if (ly->getTileGIDAt(spriteCurPos, nullptr) == Ground) {
                 ly = mapTild->getLayer("layer2");
                 ly->setTileGID(SEED, spriteCurPos);
+                character.Remove_Item(SEED, 1);
                 cropX.push_back(spriteCurPos.x);
                 cropY.push_back(spriteCurPos.y);
                 scheduleOnce(schedule_selector(MyMap::onCropMature), 2.0);
             }
         }
-        else if (character.get_tool() == HOE){
+        else if (character.get_tool() == HOE) {
             ly = mapTild->getLayer("layer0");
             ly1 = mapTild->getLayer("layer2");
             if (ly1->getTileGIDAt(spriteCurPos, nullptr) == STONE) {
@@ -275,10 +276,32 @@ void MyMap::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
             ly = mapTild->getLayer("layer2");
             if (ly->getTileGIDAt(spriteCurPos, nullptr) == CROP) {
                 ly->removeTileAt(spriteCurPos);
-                // crop++
+                character.Get_Item(CROP, 1);
+                character.Get_Item(SEED, 2);
             }
         }
         break;
+    case K_Q:
+        ly = mapTild->getLayer("layer3");
+        if (ly->getTileGIDAt(spriteCurPos, nullptr) == CHICKEN) {
+            if (chicken.Can_Feeded_Again && character.Has_CROP(2)) {
+                chicken.Feeded();
+                character.Remove_Item(CROP, chicken.GetAppetite());
+                scheduleOnce(schedule_selector(MyMap::Set_Feed_Status), 10.0);
+                if (chicken.Get_Egg(1)) {
+                    character.Get_Item(EGG, 1);
+                }
+            }
+        }
+        break;
+    case K_L:
+        ly = mapTild->getLayer("layer3");
+        if (ly->getTileGIDAt(spriteCurPos, nullptr) == CHICKEN) {
+            if (chicken.Killed()) {
+                ly->removeTileAt(spriteCurPos);
+                character.Get_Item(CHICKEN, 2);
+            }
+        }
     }
     return;
 }
@@ -290,6 +313,11 @@ void MyMap::onCropMature(float dt) {
     cropX.erase(cropX.begin());
     cropY.erase(cropY.begin());
     ly->setTileGID(CROP, Pos);
+}
+
+//重置饲喂冷却
+void MyMap::Set_Feed_Status(float dt) {
+    chicken.Set_Feed_Status();
 }
 
 //记录键盘被松开
@@ -326,6 +354,7 @@ void MyMap::Bag() {
     Director::getInstance()->pushScene(scene);
 }
 
+//进入房间
 void MyMap::Room() {
     TMXLayer* ly = mapTild->getLayer("layer0");
     if (ly->getTileGIDAt(spriteCurPos, nullptr) == DOOR) {
@@ -336,7 +365,8 @@ void MyMap::Room() {
 
 //空菜单（可用于切换场景）
 void MyMap::Set(Ref* obj) {
-
+    auto scene = Esc::createScene();
+    Director::getInstance()->pushScene(scene);
 }
 
 void MyMap::Change_Hoe(Ref* obj) {
