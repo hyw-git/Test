@@ -2,6 +2,7 @@
 #define GAMETIME_H
 
 #include "cocos2d.h"
+#include "Archive.h"
 #include <string>
 
 class GameTime : public cocos2d::Node {
@@ -22,6 +23,7 @@ public:
     CREATE_FUNC(GameTime);
 
 private:
+    friend class Archive;
     int hour;        // 当前小时
     int minute;      // 当前分钟
     bool running;    // 时间是否在流逝

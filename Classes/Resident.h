@@ -51,6 +51,9 @@ public:
     int getFriendshipPoints() const;                 // 获取当前友谊值
     int getHeartLevel() const;                       // 获取心等级
 
+    void addGold(int gold);
+    void addReputation(int reputation);
+    void setTexture(std::string);
     // 日程相关
     void updateSchedule(int currentHour); // 更新居民日程
     // 礼物相关
@@ -62,6 +65,8 @@ private:
     int heartLevel;       // 心等级
     RelationshipStatus status; // 当前关系状态
     bool heartEventTriggered;  // 是否触发特殊剧情
+    int Gold = 0;
+    int Reputation = 0;
 
     std::vector<std::shared_ptr<Task>> taskTemplates; // 任务模板
     std::vector<Schedule> dailySchedule;             // 日程安排

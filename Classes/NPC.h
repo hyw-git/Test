@@ -7,6 +7,11 @@
 
 class NPC : public cocos2d::Node {
 public:
+    NPC(const std::string& npcName, const std::vector<std::string>& npcDialogues)
+        : m_name(npcName), m_dialogues(npcDialogues), m_currentDialogueIndex(0), m_dialogueLabel(nullptr), npcSprite(nullptr) {
+    }
+    virtual ~NPC();                           // 析构函数
+
     // 创建 NPC 对象
     static NPC* create(const std::string& name, const std::string& spritePath, const std::vector<std::string>& dialogues);
 
@@ -22,11 +27,10 @@ public:
     void setSpritePosition(const cocos2d::Vec2& position);
 
     // 获取 NPC 名称
-    std::string getName() const;
+ //   std::string getName() const;
 
 private:
-    NPC();                                    // 构造函数
-    virtual ~NPC();                           // 析构函数
+    
 
     void createTouchListener();               // 创建触摸事件监听器
     void updateDialogueUI();                  // 更新对话 UI 显示

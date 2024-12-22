@@ -39,7 +39,7 @@ bool ChartLayer::init(NPC* npc)
     this->addChild(background, 0, "chat_background");
 
     // 创建对话文本标签
-    auto dialogLabel = Label::createWithTTF(currentNPC->getDialog(), "fonts/Marker Felt.ttf", 24);
+    auto dialogLabel = Label::createWithTTF(currentNPC->getCurrentDialogue(), "fonts/Marker Felt.ttf", 24);
     dialogLabel->setAnchorPoint(Vec2(0, 1));
     dialogLabel->setPosition(Vec2(50, background->getPositionY() + background->getContentSize().height / 2 - 20));
     dialogLabel->setTextColor(Color4B::WHITE);
@@ -73,15 +73,15 @@ void ChartLayer::updateDialog()
     auto dialogLabel = dynamic_cast<Label*>(this->getChildByName("dialog_label"));
     if (dialogLabel)
     {
-        currentNPC->advanceDialog(); // 推进 NPC 的对话
-        dialogLabel->setString(currentNPC->getDialog());
+        currentNPC->advanceDialogue(); // 推进 NPC 的对话
+        dialogLabel->setString(currentNPC->getCurrentDialogue());
     }
 }
 
 void ChartLayer::closeChat()
 {
     // 重置 NPC 的对话索引
-    currentNPC->jumpToDialog(0);
+    currentNPC->resetDialogue();
     this->removeFromParentAndCleanup(true);
 }
 

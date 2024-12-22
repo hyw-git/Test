@@ -18,7 +18,6 @@ bool Resident::init(const std::string& name, bool isSingle) {
     }
 
     this->name = name;
-    this->isSingle = isSingle;
     this->friendshipPoints = 0;
     this->heartLevel = 0;
     this->heartEventTriggered = false;
@@ -45,7 +44,7 @@ std::shared_ptr<Task> Resident::createTask() {
 void Resident::offerTaskToSystem(CommunitySystem* system) {
     auto task = createTask();
     if (task) {
-        system->addTask(task);
+//        system->addTask(task);
         CCLOG("%s 提供了任务：%s", name.c_str(), task->getDescription().c_str());
     }
     else {
@@ -56,7 +55,7 @@ void Resident::offerTaskToSystem(CommunitySystem* system) {
 // 完成任务
 void Resident::completeTask(std::shared_ptr<Task> task) {
     if (task->isCompleted()) {
-        int reward = task->getReward();
+        int reward = 10;//task->getReward();
         updateFriendship(reward); // 增加友好度
         CCLOG("%s 完成任务：%s，获得奖励：%d", name.c_str(), task->getDescription().c_str(), reward);
     }
@@ -68,7 +67,7 @@ void Resident::updateFriendship(int points) {
 
     // 限制友谊值上限（婚后为 3500，婚前为 2500）
     int maxFriendship = (status == RelationshipStatus::SPOUSE) ? 3500 : 2500;
-    friendshipPoints = std::clamp(friendshipPoints, 0, maxFriendship);
+ //   friendshipPoints = std::clamp(friendshipPoints, 0, maxFriendship);
 
     // 计算心等级（每 250 点对应 1 颗心）
     heartLevel = friendshipPoints / 250;
@@ -84,7 +83,7 @@ void Resident::updateFriendship(int points) {
 
 // 赠送花束（提升为恋爱关系）
 bool Resident::offerBouquet() {
-    if (heartLevel >= 8 && status == RelationshipStatus::FRIEND && isSingle) {
+    if (heartLevel >= 8 && status == RelationshipStatus::FRIEND) {
         status = RelationshipStatus::ROMANTIC; // 进入恋爱关系
 
         // 调用 PNG 图片展示
@@ -188,4 +187,11 @@ void Resident::updateSchedule(int currentHour) {
             break;
         }
     }
+}
+
+void Resident::addGold(int gold) {
+    Gold += gold;
+}
+void Resident::addReputation(int reputation) {
+    Reputation += reputation;
 }

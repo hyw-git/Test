@@ -1,16 +1,8 @@
 #include "NPC.h"
 
-NPC::NPC(const std::string& npcName, const std::vector<std::string>& npcDialogues)
-    : name(npcName), dialogues(npcDialogues), currentDialogueIndex(0), dialogueLabel(nullptr), npcSprite(nullptr) {
-}
-
-NPC::~NPC() {
-    // Cocos2d 会自动管理精灵和其他子节点的内存
-}
-
-bool NPC::init() {
+bool NPC::init(const std::string& name, const std::string& spritePath, const std::vector<std::string>& dialogues) {
     // 创建NPC精灵
-    npcSprite = cocos2d::Sprite::create("npc_image.png");
+    auto npcSprite = cocos2d::Sprite::create("npc_image.png");
     if (!npcSprite) {
         return false; // 加载精灵失败
     }
@@ -18,7 +10,7 @@ bool NPC::init() {
     this->addChild(npcSprite);  // 将精灵添加到节点
 
     // 创建显示对话的Label
-    dialogueLabel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 24);
+    auto dialogueLabel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 24);
     if (!dialogueLabel) {
         return false; // 创建对话框标签失败
     }
@@ -53,6 +45,10 @@ void NPC::jumpToDialogue(int index) {
     else {
         CCLOG("无效的对话索引。");
     }
+}
+
+std::string NPC::getName() const {
+    return m_name;
 }
 
 void NPC::resetDialogue() {
