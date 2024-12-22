@@ -1,6 +1,6 @@
 #include "GameTime.h"
 
-USING_NS_CC;
+//USING_NS_CC;
 
 static GameTime* instance = nullptr;
 
@@ -14,10 +14,12 @@ GameTime* GameTime::getInstance() {
 
 // 初始化游戏时间
 bool GameTime::init() {
+#ifndef READ_FILE
     hour = 6;         // 游戏开始时间为早上 6 点
     minute = 0;       // 初始分钟为 0
     running = false;  // 时间流逝初始设置为停止
     timeSpeed = 0.7f; // 时间流速：现实 0.7 秒 = 游戏内 1 分钟
+#endif
     return true;
 }
 

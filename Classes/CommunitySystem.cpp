@@ -58,7 +58,7 @@ void CommunitySystem::generateDailyTasks() {
 }
 
 // 分配任务
-void CommunitySystem::assignRandomTask(Resident* resident) {
+void CommunitySystem::assignRandomTask(std::shared_ptr<Resident> resident) {
     if (availableTasks.empty()) {
         generateDailyTasks(); // 如果没有任务可用，则生成每日任务
     }

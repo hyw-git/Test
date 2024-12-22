@@ -1,15 +1,18 @@
-#ifndef GAMESCENE_H
-#define GAMESCENE_H
+#ifndef __GAMESCENE_H__
+#define __GAMESCENE_H__
 
 #include "cocos2d.h"
 #include "CommunitySystem.h"
+USING_NS_CC;
 
 class GameScene : public cocos2d::Scene {
 public:
+    GameScene();
     static GameScene* createScene(); // 创建场景
     virtual bool init();             // 初始化场景
     void update(float dt);           // 每帧更新
 
+    void menuCloseCallback(cocos2d::Ref* pSender);// a selector callback
     CREATE_FUNC(GameScene);
 
 private:

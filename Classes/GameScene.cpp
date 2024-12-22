@@ -100,3 +100,8 @@ std::string GameScene::getDayFromTime() {
     default: return "Day1";
     }
 }
+
+void GameScene::menuCloseCallback(Ref* pSender)
+{
+    Director::getInstance()->end();
+}
